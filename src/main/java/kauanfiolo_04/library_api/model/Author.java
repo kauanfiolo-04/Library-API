@@ -15,7 +15,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Author {
-    @Deprecated
     public Author() {}
 
     @Id
