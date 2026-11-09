@@ -1,0 +1,8 @@
+# Create docker network
+docker network create library-network
+
+# Run postgres container in version 18.6 on the library-network
+docker run --name librarydb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=library --network library-network postgres:18.6
+
+# Run pgadmin4 container on the library-network
+docker run --name pgadmin4 -e PGADMIN_DEFAULT_EMAIL=admin@admin.com -e PGADMIN_DEFAULT_PASSWORD=admin -p 15432:80 --network library-network dpage/pgadmin4:9.18.0
