@@ -4,15 +4,15 @@ import kauanfiolo_04.library_api.controller.dto.AuthorDTO;
 import kauanfiolo_04.library_api.controller.dto.AuthorResponseDTO;
 import kauanfiolo_04.library_api.model.Author;
 import kauanfiolo_04.library_api.service.AuthorService;
-import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/authors")
@@ -68,5 +68,22 @@ public class AuthorController {
 
         service.delete(authorOpt.get());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AuthorResponseDTO>> search(
+        @RequestParam(value = "name", required = false)
+        String name,
+        @RequestParam(value = "nationality", required = false)
+        String nationality
+    ) {
+        List<Author> authorList = service.search(name, nationality);
+
+        List<AuthorResponseDTO> response =
+            authorList.stream().map(
+                a -> new AuthorResponseDTO(a.getId(), a.getName(), a.getBirthDate(), a.getNationality())
+            ).collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 }
