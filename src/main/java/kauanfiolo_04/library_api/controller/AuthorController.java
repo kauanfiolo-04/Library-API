@@ -7,7 +7,7 @@ import kauanfiolo_04.library_api.exception.DuplicatedRegisterException;
 import kauanfiolo_04.library_api.exception.NotAllowedOperationException;
 import kauanfiolo_04.library_api.model.Author;
 import kauanfiolo_04.library_api.service.AuthorService;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,13 +20,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/authors")
+@RequiredArgsConstructor
 public class AuthorController {
 
     private final AuthorService service;
-
-    public AuthorController(AuthorService service) {
-        this.service = service;
-    }
 
     @PostMapping
     public ResponseEntity<?> save(@RequestBody AuthorDTO authorDTO) {
