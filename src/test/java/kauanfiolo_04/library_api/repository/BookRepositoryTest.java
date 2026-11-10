@@ -23,12 +23,14 @@ class BookRepositoryTest {
 
     @Test
     void saveTest() {
+        /*
         Author author = new Author();
         author.setName("Kauan Fiolo");
         author.setBirthDate(LocalDate.of(2004, 4, 8));
         author.setNationality("Brazilian");
 
-        authorRepository.save(author); // if you put CascadeType.ALL in the relation you won't need it
+        authorRepository.save(author); // if you put CascadeType.ALL in the relation you won't need it */
+
 
         Book book = new Book();
         book.setIsbn("080408040804");
@@ -36,6 +38,11 @@ class BookRepositoryTest {
         book.setPrice(BigDecimal.valueOf(84.25));
         book.setGenre(BookGenre.BIOGRAPHY);
         book.setPublishDate(LocalDate.of(2004, 4, 8));
+
+        Author author = authorRepository
+            .findById(UUID.fromString("6ea9d558-79c9-4d21-a669-b7fce293f333"))
+            .orElse(null);
+
         book.setAuthor(author);
 
         repository.save(book);

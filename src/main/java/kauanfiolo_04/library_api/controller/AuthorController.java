@@ -2,8 +2,12 @@ package kauanfiolo_04.library_api.controller;
 
 import kauanfiolo_04.library_api.controller.dto.AuthorDTO;
 import kauanfiolo_04.library_api.controller.dto.AuthorResponseDTO;
+import kauanfiolo_04.library_api.controller.dto.ResponseError;
+import kauanfiolo_04.library_api.exception.DuplicatedRegisterException;
+import kauanfiolo_04.library_api.exception.NotAllowedOperationException;
 import kauanfiolo_04.library_api.model.Author;
 import kauanfiolo_04.library_api.service.AuthorService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -25,17 +29,23 @@ public class AuthorController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody AuthorDTO authorDTO) {
-        Author author = authorDTO.mapToAuthor();
-        service.save(author);
+    public ResponseEntity<?> save(@RequestBody AuthorDTO authorDTO) {
+        try {
+            Author author = authorDTO.mapToAuthor();
+            service.save(author);
 
-        URI location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(author.getId())
-            .toUri();
+            URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(author.getId())
+                .toUri();
 
-        return ResponseEntity.created(location).build();
+            return ResponseEntity.created(location).build();
+        } catch (DuplicatedRegisterException e) {
+            ResponseError errorDTO = ResponseError.conflict(e.getMessage());
+
+            return ResponseEntity.status(errorDTO.status()).body(errorDTO);
+        }
     }
 
     @GetMapping("/{id}")
@@ -59,15 +69,21 @@ public class AuthorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
-        UUID authorId = UUID.fromString(id);
+    public ResponseEntity<?> delete(@PathVariable("id") String id) {
+        try {
+            UUID authorId = UUID.fromString(id);
 
-        Optional<Author> authorOpt = service.getById(authorId);
+            Optional<Author> authorOpt = service.getById(authorId);
 
-        if (authorOpt.isEmpty()) return ResponseEntity.notFound().build();
+            if (authorOpt.isEmpty()) return ResponseEntity.notFound().build();
 
-        service.delete(authorOpt.get());
-        return ResponseEntity.noContent().build();
+            service.delete(authorOpt.get());
+            return ResponseEntity.noContent().build();
+        } catch (NotAllowedOperationException e) {
+            ResponseError errorDTO = ResponseError.defaultResponse(e.getMessage());
+
+            return ResponseEntity.status(errorDTO.status()).body(errorDTO);
+        }
     }
 
     @GetMapping
@@ -88,23 +104,29 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(
+    public ResponseEntity<?> update(
         @PathVariable("id") String id,
         @RequestBody AuthorDTO dto
     ) {
-        UUID authorId = UUID.fromString(id);
+        try {
+            UUID authorId = UUID.fromString(id);
 
-        Optional<Author> authorOpt = service.getById(authorId);
+            Optional<Author> authorOpt = service.getById(authorId);
 
-        if (authorOpt.isEmpty()) return ResponseEntity.notFound().build();
+            if (authorOpt.isEmpty()) return ResponseEntity.notFound().build();
 
-        Author author = authorOpt.get();
-        author.setName(dto.name());
-        author.setBirthDate(dto.birthDate());
-        author.setNationality(dto.nationality());
+            Author author = authorOpt.get();
+            author.setName(dto.name());
+            author.setBirthDate(dto.birthDate());
+            author.setNationality(dto.nationality());
 
-        service.update(author);
+            service.update(author);
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+        } catch (DuplicatedRegisterException e) {
+            ResponseError errorDTO = ResponseError.conflict(e.getMessage());
+
+            return ResponseEntity.status(errorDTO.status()).body(errorDTO);
+        }
     }
 }
