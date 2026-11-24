@@ -91,7 +91,7 @@ public class AuthorController {
         @RequestParam(value = "nationality", required = false)
         String nationality
     ) {
-        List<Author> authorList = service.search(name, nationality);
+        List<Author> authorList = service.searchByExample(name, nationality);
 
         List<AuthorResponseDTO> response =
             authorList.stream().map(

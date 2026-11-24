@@ -6,6 +6,8 @@ import kauanfiolo_04.library_api.repository.AuthorRepository;
 import kauanfiolo_04.library_api.repository.BookRepository;
 import kauanfiolo_04.library_api.validator.AuthorValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,6 +58,21 @@ public class AuthorService {
         if (nationality != null) return repository.findByNationality(nationality);
 
         return repository.findAll();
+    }
+
+    public List<Author> searchByExample(String name, String nationality) {
+        var author = new Author();
+        author.setName(name);
+        author.setNationality(nationality);
+
+        ExampleMatcher matcher = ExampleMatcher
+            .matching()
+            .withIgnoreNullValues()
+            .withIgnoreCase()
+            .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example<Author> exampleAuthor = Example.of(author, matcher);
+
+        return repository.findAll(exampleAuthor);
     }
 
     public boolean hasAnyBook(Author author) {
