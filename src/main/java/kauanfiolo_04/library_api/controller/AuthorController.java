@@ -1,5 +1,6 @@
 package kauanfiolo_04.library_api.controller;
 
+import jakarta.validation.Valid;
 import kauanfiolo_04.library_api.controller.dto.AuthorDTO;
 import kauanfiolo_04.library_api.controller.dto.AuthorResponseDTO;
 import kauanfiolo_04.library_api.controller.dto.ResponseError;
@@ -26,7 +27,7 @@ public class AuthorController {
     private final AuthorService service;
 
     @PostMapping
-    public ResponseEntity<?> save(@RequestBody AuthorDTO authorDTO) {
+    public ResponseEntity<?> save(@RequestBody @Valid AuthorDTO authorDTO) {
         try {
             Author author = authorDTO.mapToAuthor();
             service.save(author);
